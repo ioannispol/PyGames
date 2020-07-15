@@ -137,7 +137,6 @@ def main():
 
 while True:
     main()
-
-
+    break
 pygame.quit()
 
