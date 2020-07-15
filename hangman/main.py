@@ -6,6 +6,7 @@ https://www.youtube.com/watch?v=UEO1B_llDnc&list=PLzMcBGfZo4-ndZlN21DasvpfKwIc1r
 
 import pygame
 import math
+import random
 
 # setup display
 pygame.init()
@@ -34,22 +35,38 @@ for i in range(26):
 
 # fonts
 LETTER_FONT = pygame.font.SysFont('comicsans', 40)
+WORD_FONT = pygame.font.SysFont('comicsans', 60)
+TITLE_FONT = pygame.font.SysFont('comicsans', 70)
+
 
 # game variables
 hangman_status = 0
+words = ["IDE", "PYTHON", "SUBLIME", "PYGAME"]
+word = random.choice(words)
+guessed = []
 
 # colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 
-# setup game loop
-FPS = 60
-clock = pygame.time.Clock()
-run = True
-
 def draw():
     win.fill(WHITE)
+
+    # draw title
+    text = TITLE_FONT.render("DEVELOPER HANGMAN", 1, BLACK)
+    win.blit(text, (WIDTH/2 - text.get_width()/2, 20))
+
+    # draw word
+    display_word = ""
+    for letter in word:
+        if letter in guessed:
+            display_word += letter + " "
+        else:
+            display_word += "_ "
+    text = WORD_FONT.render(display_word, 1, BLACK)
+    win.blit(text, (400, 200))
+
 
     # draw buttons
     for letter in letters:
@@ -64,24 +81,62 @@ def draw():
     pygame.display.update()
 
 
-while run:
-    clock.tick(FPS)
+def display_message(message):
+    pygame.time.delay(1000)
+    win.fill(WHITE)
+    text = WORD_FONT.render(message, 1, BLACK)
+    win.blit(text, (WIDTH/2 - text.get_width()/2,
+             HEIGHT/2 - text.get_height()/2))
+    pygame.display.update()
+    pygame.time.delay(3000)
 
-    draw()
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
+def main():
+    global hangman_status
+    FPS = 60
+    clock = pygame.time.Clock()
+    run = True
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            m_x, m_y = pygame.mouse.get_pos()  # top lefe t corner is (0, 0)
-            for letter in letters:
-                x, y, ltr, vissible = letter
-                if vissible:
-                    # use Pythagorian theorem to determine the distance between the mouse and the button
-                    dis = math.sqrt((x - m_x)**2 + (y - m_y)**2)
-                    if dis < RADIUS:
-                        letter[3] = False
+    while run:
+        clock.tick(FPS)
+
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                m_x, m_y = pygame.mouse.get_pos()  # top lefe t corner is (0, 0)
+                for letter in letters:
+                    x, y, ltr, vissible = letter
+                    if vissible:
+                        # use Pythagorian theorem to determine the distance
+                        # between the mouse and the button
+                        dis = math.sqrt((x - m_x)**2 + (y - m_y)**2)
+                        if dis < RADIUS:
+                            letter[3] = False
+                            guessed.append(ltr)
+                            if ltr not in word:
+                                hangman_status += 1
+
+        draw()
+
+        won = True
+        for letter in word:
+            if letter not in guessed:
+                won = False
+                break
+
+        if won:
+            display_message("You WON!")
+            break
+
+        if hangman_status == 6:
+            display_message("You LOST!")
+            break
+
+while True:
+    main()
 
 
 pygame.quit()
