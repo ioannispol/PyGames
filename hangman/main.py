@@ -3,7 +3,6 @@ Python Hangman Game
 from tutorial:
 https://www.youtube.com/watch?v=UEO1B_llDnc&list=PLzMcBGfZo4-ndZlN21DasvpfKwIc1rI6w
 """
-
 import pygame
 import math
 import random
@@ -135,6 +134,7 @@ def main():
             display_message("You LOST!")
             break
 
+# ToDo: create an option to choose whether to continue the game or not
 while True:
     main()
     break
